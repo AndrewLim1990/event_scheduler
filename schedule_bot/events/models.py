@@ -9,8 +9,8 @@ class Event(models.Model):
     """
     name = models.CharField(max_length=512, null=True, default=None)
     # On delete, must choose new host:
-    host_member = models.ForeignKey(User, on_delete=models.PROTECT, related_name="host_member")
-    members = models.ManyToManyField(User, null=True, default=None)
+    host_member = models.ForeignKey(User, on_delete=models.PROTECT, related_name="events_hosted")
+    members = models.ManyToManyField(User, null=True, default=None, related_name="events_invited")
 
 
 class EventTime(models.Model):
