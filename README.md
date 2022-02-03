@@ -16,5 +16,8 @@
 ## Challenges:
 1. Importing contacts
    * [You probably can't from a webapp](https://stackoverflow.com/questions/24076800/can-a-website-html5-javascript-access-a-mobile-devices-android-iphone-conta)
+   * Import from WhatsApp/Line/etc?
+   * Manually input numbers? (barf)
+   * Make mobile app? (barf)
 2. Sending SMS messages from django
    * [Twilio seems easy to implement](https://www.youtube.com/watch?v=KYQ3u3xDPRA)
