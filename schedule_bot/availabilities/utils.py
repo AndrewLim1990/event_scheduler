@@ -27,9 +27,9 @@ def check_availabilities(event):
     :return: tuple of the form:
         (
             {
-                event_time_id_1: [username_1, username_2],  <- list of usernames able to attend
-                event_time_id_2: [username_1],
-                event_time_id_3: [username_1, username_2]
+                event_time_id_1: [user_1, user_2],  <- list of users able to attend
+                event_time_id_2: [user_1],
+                event_time_id_3: [user_1, user_2]
                 ...
                 event_time_id_n: []
             },
@@ -53,7 +53,7 @@ def check_availabilities(event):
         for availability in availabilities:
             is_available = availability.check_availability(event_time)
             if is_available:
-                availability_dict[event_time.id].append(availability.user.username)
+                availability_dict[event_time.id].append(availability.user)
         everyone_is_available = len(availability_dict[event_time.id]) == n_participants
         if everyone_is_available:
             times_that_work.append(event_time.id)
