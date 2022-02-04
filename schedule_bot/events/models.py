@@ -17,6 +17,6 @@ class EventTime(models.Model):
     """
     Represents a proposed event time
     """
-    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="event_times")
     date_time_start = models.DateTimeField()
     date_time_end = models.DateTimeField()
