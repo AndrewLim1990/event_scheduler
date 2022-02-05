@@ -1,3 +1,6 @@
+import parsedatetime
+
+
 def get_all_event_participants(event):
     """
     Returns all event members + host_member
@@ -13,3 +16,17 @@ def get_all_event_participants(event):
     participants = host_member + members
 
     return participants
+
+
+def string_to_date_time(input_string):
+    """
+    Translates input_string into datetime
+    """
+    # Convert string to structtime
+    cal = parsedatetime.Calendar()
+    struct_time, __ = cal.parse(input_string)
+
+    # Convert structtime to datetime
+    date_time = datetime.datetime(*struct_time[:6])
+
+    return date_time
