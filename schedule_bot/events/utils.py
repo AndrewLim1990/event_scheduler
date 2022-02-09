@@ -1,6 +1,9 @@
 import datetime
 import parsedatetime
 
+from django.contrib.auth.models import User
+from events.models import Event
+
 
 def get_all_event_participants(event):
     """
@@ -9,12 +12,8 @@ def get_all_event_participants(event):
     :param event: an Event objects to get all participants for
     :return: list of User objects
     """
-    # Gets host and members
-    host_member = [event.host_member]
-    members = list(event.members.all())
-
-    # Combines host and members
-    participants = host_member + members
+    user_ids = list(Event.objects.filter(id=event.id).values_list("users__user_id", flat=True))
+    participants = list(User.objects.filter(id__in=user_ids))
 
     return participants
 
