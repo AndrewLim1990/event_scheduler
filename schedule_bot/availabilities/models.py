@@ -3,6 +3,9 @@ from django.contrib.auth.models import User
 
 
 class Availability(models.Model):
+    """
+    Represents User availability independent of a specific event
+    """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.CharField(default=None, null=True, max_length=512)
     is_available = models.BooleanField()
