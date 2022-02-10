@@ -19,6 +19,15 @@ class EventTime(models.Model):
     date_time_end = models.DateTimeField()
 
 
+class UserEventTime(models.Model):
+    """
+    Represents relation between a User and an EventTime
+    """
+    event_time = models.ForeignKey(EventTime, on_delete=models.CASCADE, related_name="user_event_time")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_event_time")
+    is_active = models.BooleanField(default=False)
+
+
 class UserEvent(models.Model):
     """
     Represents a junction table between User and Event
