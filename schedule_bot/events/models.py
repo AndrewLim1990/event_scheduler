@@ -39,13 +39,15 @@ class UserEvent(models.Model):
     WAITING_FOR_OTHERS = "waiting_for_others"
     IS_ATTENDING = "is_attending"
     IS_NOT_ATTENDING = "is_not_attending"
+    NO_COMMUNICATION = "no_communication"
     STATE_CHOICES = [
-        (WAITING_RESPONSE, "Waiting for attendance from user"),
-        (WAITING_SUGGESTION, "Waiting for date suggestion from user"),
-        (WAITING_VALIDATION, "Waiting for date validation from user"),
-        (WAITING_FOR_OTHERS, "Waiting for other users to respond to suggestions"),
-        (IS_ATTENDING, "Is able to attend event"),
-        (IS_NOT_ATTENDING, "Has elected to not attend event"),
+        (WAITING_RESPONSE, "We are waiting for attendance from user"),
+        (WAITING_SUGGESTION, "We are waiting for date suggestion from user"),
+        (WAITING_VALIDATION, "We are waiting for date validation from user"),
+        (WAITING_FOR_OTHERS, "We are waiting for other users to respond to suggestions"),
+        (IS_ATTENDING, "User is able to attend event"),
+        (IS_NOT_ATTENDING, "User has elected to not attend event"),
+        (NO_COMMUNICATION, "We haven't sent any communication"),
     ]
     state = models.CharField(choices=STATE_CHOICES, max_length=256, null=True, default=None)
 
