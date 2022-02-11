@@ -27,7 +27,17 @@ class UserEventTime(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_event_time")
     is_active = models.BooleanField(default=False)
     has_seen = models.BooleanField(default=False)
-    can_come = models.BooleanField(default=False)
+
+    NO_RESPONSE = "waiting_response"
+    CAN_COME = "waiting_suggestion"
+    CANNOT_COME = "waiting_validation"
+    STATE_CHOICES = [
+        (NO_RESPONSE, "Has not answered for this event time"),
+        (CAN_COME, "Has explicitly said they cannot come to this time slot"),
+        (CANNOT_COME, "Has explicitly said they can come to this time slot"),
+    ]
+
+    explicit_response = models.CharField(choices=STATE_CHOICES, max_length=256, null=True, default=NO_RESPONSE)
 
 
 class UserEvent(models.Model):
