@@ -27,6 +27,7 @@ class UserEventTime(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_event_time")
     is_active = models.BooleanField(default=False)
     has_seen = models.BooleanField(default=False)
+    can_come = models.BooleanField(default=False)
 
 
 class UserEvent(models.Model):
