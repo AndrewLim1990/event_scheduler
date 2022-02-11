@@ -49,7 +49,7 @@ class UserEvent(models.Model):
         (IS_NOT_ATTENDING, "User has elected to not attend event"),
         (NO_COMMUNICATION, "We haven't sent any communication"),
     ]
-    state = models.CharField(choices=STATE_CHOICES, max_length=256, null=True, default=None)
+    state = models.CharField(choices=STATE_CHOICES, max_length=256, null=True, default=NO_COMMUNICATION)
 
     user = models.ForeignKey(User, related_name="events", on_delete=models.CASCADE)
     event = models.ForeignKey(Event, related_name="users", on_delete=models.CASCADE)
