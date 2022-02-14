@@ -29,8 +29,8 @@ class UserEventTime(models.Model):
     has_seen = models.BooleanField(default=False)
 
     NO_RESPONSE = "waiting_response"
-    CAN_COME = "waiting_suggestion"
-    CANNOT_COME = "waiting_validation"
+    CAN_COME = "can_come"
+    CANNOT_COME = "cannot_come"
     STATE_CHOICES = [
         (NO_RESPONSE, "Has not answered for this event time"),
         (CAN_COME, "Has explicitly said they cannot come to this time slot"),
