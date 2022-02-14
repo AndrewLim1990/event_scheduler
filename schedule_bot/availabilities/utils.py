@@ -1,6 +1,8 @@
 from availabilities.models import Availability
-from events.utils import get_all_event_participants
 from collections import defaultdict
+from django.contrib.auth.models import User
+from events.models import UserEventTime
+from events.utils import get_all_event_participants
 from events.models import EventTime
 
 
@@ -17,6 +19,26 @@ def get_availabilities_for_participants(participants):
         availabilities += list(availability_model.objects.filter(user__in=participants))
 
     return availabilities
+
+
+def get_users_declined(event_time):
+    """
+    Returns users that explicitly cannot attend event_time
+
+    :param event_time:
+    :param users:
+    :return:
+    """
+
+    participants = get_all_event_participants(event_time.event)
+    user_ids = list(UserEventTime.objects.filter(
+        event_time=event_time,
+        user__in=participants,
+        explicit_response=UserEventTime.CANNOT_COME
+    ).values_list("user_id", flat=True))
+    users_declined = list(User.objects.filter(id__in=user_ids))
+
+    return users_declined
 
 
 def check_availabilities(event):
@@ -46,13 +68,16 @@ def check_availabilities(event):
     # Gets suggested event times
     suggested_event_times = list(EventTime.objects.filter(event=event))
 
-    # Compares availabilities against suggested times
+    # Compares implicit availabilities against suggested times
     availability_dict = defaultdict(list)
     times_that_work = list()
     for event_time in suggested_event_times:
+        # Gets users that explicitly cannot attend event_time
+        users_declined = get_users_declined(event_time)
         for availability in availabilities:
             is_available = availability.check_availability(event_time)
-            if is_available:
+            has_explicitly_declined = availability.user in users_declined
+            if is_available and not has_explicitly_declined:
                 availability_dict[event_time.id].append(availability.user)
         everyone_is_available = len(availability_dict[event_time.id]) == n_participants
         if everyone_is_available:
