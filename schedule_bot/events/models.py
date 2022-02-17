@@ -66,3 +66,13 @@ class UserEvent(models.Model):
     event = models.ForeignKey(Event, related_name="users", on_delete=models.CASCADE)
     is_required = models.BooleanField()
     is_host = models.BooleanField()
+
+
+class SuggestedDate(models.Model):
+    """
+    Represents a text from a user suggesting a date
+    """
+    is_verified = models.BooleanField()
+    input_text = models.CharField(max_length=256)
+    interpreted_start = models.DateTimeField()
+    interpreted_end = models.DateTimeField()
