@@ -84,3 +84,22 @@ def check_availabilities(event):
             times_that_work.append(event_time.id)
 
     return availability_dict, times_that_work
+
+
+def find_available_unseen_suggested_date(user_event):
+    """
+    Finds an UserEventTime that works for all Event participants
+    """
+
+    # Filters for event_times that work for everybody
+    __, viable_event_times = check_availabilities(user_event.event)
+
+    # Filters for unseen user_event_times
+    valid_user_event_times = list(UserEventTime.objects.filter(
+        user=user_event.user,
+        event_time__in=viable_event_times,
+        has_seen=False,
+        is_active=False
+    ))
+
+    return valid_user_event_times
