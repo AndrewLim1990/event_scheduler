@@ -70,7 +70,7 @@ class UserEventMachine:
 
     def send_initial_text(self):
         try:
-            self.state.send_initial_text(self, self.user_event)
+            self.state.send_initial_text(self)
         except AttributeError:
             raise NotImplementedError(f"Cannot send_initial_text while in {self.state.state_name} state")
 
@@ -92,20 +92,51 @@ class UserEventMachine:
         except AttributeError:
             raise NotImplementedError(f"Cannot process_validation_text while in {self.state.state_name} state")
 
+    def invite_user(self, identifier, identifier_type="phone_number", is_required=True):
+        """
+        :param identifier:
+        :param identifier_type:
+        :param is_required:
+        :return:
+        """
+        event = self.user_event.event
+        if identifier_type == "phone_number":
+            invitee, __ = User.objects.get_or_create(user_info__phone_number=identifier)
+        elif identifier_type == "email":
+            invitee, __ = User.objects.get_or_create(email=identifier)
+        elif identifier_type == "username":
+            invitee, __ = User.objects.get_or_create(username=identifier)
+        else:
+            raise NotImplementedError(f"Cannot invite user of identifier_type: {identifier_type}")
+        invitee_user_event, __ = UserEvent.objects.update_or_create(
+            user=invitee,
+            event=event,
+            defaults={"is_required": is_required, "is_host": False}
+        )
+        invitee_user_event_machine = UserEventMachine(invitee_user_event)
+        invitee_user_event_machine.send_initial_text()
+
 
 class NoCommunicationState:
     def __init__(self):
         self.state_name = UserEvent.NO_COMMUNICATION
 
     @staticmethod
-    def send_initial_text(machine, user_event):
+    def send_initial_text(machine):
         """
         :param machine:
         :param user_event:
         :return:
         """
-        # Transition to next state
-        machine.set_state(UserEvent.WAITING_RESPONSE)
+        user_event_times = find_available_unseen_suggested_date(machine.user_event)
+        no_viable_times = len(user_event_times) == 0
+
+        if no_viable_times:
+            # Transition to next state: WAITING_SUGGESTION
+            machine.set_state(UserEvent.WAITING_SUGGESTION)
+        else:
+            # Transition to next state: WAITING_RESPONSE
+            machine.set_state(UserEvent.WAITING_RESPONSE)
 
 
 class WaitingResponseState:
