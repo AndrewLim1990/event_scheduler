@@ -62,26 +62,35 @@ def check_availabilities(event):
     participants = get_all_event_participants(event)
     n_participants = len(participants)
 
-    # Gets all availabilities
-    availabilities = get_availabilities_for_participants(participants)
-
     # Gets suggested event times
     suggested_event_times = list(EventTime.objects.filter(event=event))
 
-    # Compares implicit availabilities against suggested times
     availability_dict = defaultdict(list)
     times_that_work = list()
     for event_time in suggested_event_times:
         # Gets users that explicitly cannot attend event_time
         users_declined = get_users_declined(event_time)
-        for availability in availabilities:
-            is_available = availability.check_availability(event_time)
-            has_explicitly_declined = availability.user in users_declined
-            if is_available and not has_explicitly_declined:
-                availability_dict[event_time.id].append(availability.user)
-        everyone_is_available = len(availability_dict[event_time.id]) == n_participants
-        if everyone_is_available:
-            times_that_work.append(event_time.id)
+
+        for participant in participants:
+            # Checks for explicit declines
+            has_explicitly_declined = participant in users_declined
+
+            if not has_explicitly_declined:
+                # Gets implicit availabilities
+                availabilities = get_availabilities_for_participants([participant])
+
+                # Compares implicit availabilities against suggested times
+                if availabilities:
+                    for availability in availabilities:
+                        is_available = availability.check_availability(event_time)
+                        if is_available:
+                            availability_dict[event_time.id].append(participant)
+                else:
+                    availability_dict[event_time.id].append(participant)
+
+                everyone_is_available = len(availability_dict[event_time.id]) == n_participants
+                if everyone_is_available:
+                    times_that_work.append(event_time.id)
 
     return availability_dict, times_that_work
 
