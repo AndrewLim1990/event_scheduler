@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 class Availability(models.Model):
@@ -63,3 +64,8 @@ class WeekAvailability(Availability):
         (WEEKDAY, "Weekday"),
     ]
     week_availability = models.CharField(choices=WEEK_AVAILABILITY_CHOICES, max_length=256)
+
+
+class UserInformation(models.Model):
+    user = models.OneToOneField(User, related_name="user_information", on_delete=models.CASCADE)
+    phone_number = PhoneNumberField(null=True, unique=True, default=None)
