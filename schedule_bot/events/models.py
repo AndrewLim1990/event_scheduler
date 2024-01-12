@@ -33,8 +33,8 @@ class UserEventTime(models.Model):
     CANNOT_COME = "cannot_come"
     STATE_CHOICES = [
         (NO_RESPONSE, "Has not answered for this event time"),
-        (CAN_COME, "Has explicitly said they cannot come to this time slot"),
-        (CANNOT_COME, "Has explicitly said they can come to this time slot"),
+        (CAN_COME, "Has explicitly said they can come to this time slot"),
+        (CANNOT_COME, "Has explicitly said they cannot come to this time slot"),
     ]
 
     explicit_response = models.CharField(choices=STATE_CHOICES, max_length=256, null=True, default=NO_RESPONSE)
