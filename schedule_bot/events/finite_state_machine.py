@@ -239,6 +239,15 @@ class WaitingForOthersState:
     def execute(self, user_event):
         update_user_event_state(user_event, state=UserEvent.WAITING_FOR_OTHERS)
 
+        # Checks to see if there are any other invitees who are not WaitingForOthers
+        no_communication_user_events = UserEvent.objects.filter(
+            event=user_event.event,
+            state=UserEvent.NO_COMMUNICATION
+        )
+        for no_communication_user_event in no_communication_user_events:
+            uem = UserEventMachine(no_communication_user_event)
+            uem.set_state(UserEvent.WAITING_RESPONSE)
+
 
 class WaitingValidationState:
     def __init__(self):
