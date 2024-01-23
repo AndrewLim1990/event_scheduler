@@ -16,8 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.urls.conf import include
+from schedule_bot.views import home
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('messages.urls')),
+    path('messages/', include('messages.urls')),
+    path('', home, name='home')
 ]
