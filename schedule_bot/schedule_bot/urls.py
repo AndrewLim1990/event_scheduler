@@ -21,5 +21,6 @@ from schedule_bot.views import home
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('messages/', include('messages.urls')),
+    path('events/', include('events.urls')),
     path('', home, name='home')
 ]
