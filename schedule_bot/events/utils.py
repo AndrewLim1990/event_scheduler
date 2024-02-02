@@ -1,7 +1,7 @@
 import datetime
-
 import pandas as pd
 import parsedatetime
+import pytz
 
 from django.contrib.auth.models import User
 from events.models import Event, EventTime, UserEvent, UserEventTime
@@ -20,7 +20,7 @@ def get_all_event_participants(event):
     return participants
 
 
-def string_to_date_time(input_string):
+def string_to_date_time(input_string, tz="America/Los_Angeles"):
     """
     Translates input_string into datetime
     """
@@ -30,6 +30,10 @@ def string_to_date_time(input_string):
 
     # Convert structtime to datetime
     date_time = datetime.datetime(*struct_time[:6])
+
+    # Localize time
+    tz = pytz.timezone(tz)
+    date_time = tz.localize(datetime)
 
     return date_time
 

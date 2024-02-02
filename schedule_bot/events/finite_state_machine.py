@@ -80,18 +80,6 @@ class UserEventMachine:
         except AttributeError:
             raise NotImplementedError(f"Cannot process_input_text while in {self.state.state_name} state")
 
-    def process_suggestion_text(self, suggestion_text):
-        try:
-            self.state.process_suggestion_text(self, self.user_event, suggestion_text)
-        except AttributeError:
-            raise NotImplementedError(f"Cannot process_suggestion_text while in {self.state.state_name} state")
-
-    def process_validation_text(self, validation_response):
-        try:
-            self.state.process_validation_text(self, self.user_event, validation_response)
-        except AttributeError:
-            raise NotImplementedError(f"Cannot process_validation_text while in {self.state.state_name} state")
-
     def invite_user(self, identifier, identifier_type="phone_number", is_required=True):
         """
         :param identifier:
@@ -201,7 +189,7 @@ class WaitingSuggestionState:
         print("There are no viable event times, can you please suggest a time that works for you?")
         update_user_event_state(user_event, state=UserEvent.WAITING_SUGGESTION)
 
-    def process_suggestion_text(self, machine, user_event, suggestion_text):
+    def process_input_text(self, machine, user_event, suggestion_text):
         """
         Compares suggested_event_time against all members in event
 
@@ -248,9 +236,8 @@ class WaitingValidationState:
         update_user_event_state(user_event, state=UserEvent.WAITING_VALIDATION)
 
     @staticmethod
-    def process_validation_text(machine, user_event, validation_response):
+    def process_input_text(machine, user_event, validation_response):
         """
-
         :param machine:
         :param user_event:
         :param validation_response:
@@ -283,21 +270,16 @@ class WaitingValidationState:
                 explicit_response=UserEventTime.CAN_COME
             )
 
-            # Moves all participants WAITING_OTHERS | WAITING_SUGGESTION -> WAITING_RESPONSE
-            event = user_event.event
-            waiting_user_events = UserEvent.objects.filter(
-                event=event,
-                state__in=[UserEvent.WAITING_FOR_OTHERS, UserEvent.WAITING_SUGGESTION]
-            )
-            for waiting_user_event in waiting_user_events:
-                uem = UserEventMachine(waiting_user_event)
-                uem.set_state(UserEvent.WAITING_RESPONSE)
-
             # Updates state
             machine.set_state(UserEvent.WAITING_FOR_OTHERS)
         else:
+            suggested_date = SuggestedDate.objects.get(user_event=user_event, is_verified=False, is_active=True)
+            suggested_date.is_active = False
+            suggested_date.is_verified = False
+            suggested_date.save()
+
             print(
-                "We're sorry, can you please provide your suggested time in the format similar to:\n 2022-1-12 4PM to "
+                "Sorry, can you please provide your suggested time in the format similar to:\n 2022-1-12 4PM to "
                 "2022-1-12 7PM "
             )
 

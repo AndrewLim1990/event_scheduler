@@ -29,7 +29,7 @@ class DateAvailability(Availability):
         """
         Checks availability against suggested date
 
-        :param suggested_date:
+        :param event_time:
         :return:
         """
         event_start = event_time.date_time_start
