@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'events',
+    'communications',
     'rest_framework'
 ]
 
