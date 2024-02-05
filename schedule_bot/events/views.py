@@ -1,6 +1,6 @@
-from datetime import datetime
 from django.contrib.auth.models import User
 from events.utils import create_event
+from events.utils import string_to_date_time
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -24,8 +24,8 @@ def event_initialization(request):
         proposed_times = []
         for start, end in event_times:
             proposed_times.append((
-                datetime.strptime(start, '%m/%d/%y %H:%M:%S'),
-                datetime.strptime(end, '%m/%d/%y %H:%M:%S')
+                string_to_date_time(start),
+                string_to_date_time(end),
             ))
 
         # Creates Event and UserEvent associations for all participants
