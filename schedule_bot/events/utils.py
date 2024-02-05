@@ -29,11 +29,11 @@ def string_to_date_time(input_string, tz="America/Los_Angeles"):
     struct_time, __ = cal.parse(input_string)
 
     # Convert structtime to datetime
-    date_time = datetime.datetime(*struct_time[:6])
+    date_time = datetime.datetime(*struct_time[:5])
 
     # Localize time
     tz = pytz.timezone(tz)
-    date_time = tz.localize(datetime)
+    date_time = tz.localize(date_time)
 
     return date_time
 
