@@ -26,4 +26,4 @@ class UserEventMessage(models.Model):
         (IS_INCOMING, "Message from user")
     ]
 
-    explicit_response = models.CharField(choices=DIRECTION_CHOICES, max_length=256, null=True)
+    direction = models.CharField(choices=DIRECTION_CHOICES, max_length=256, null=True)
