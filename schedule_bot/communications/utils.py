@@ -15,9 +15,9 @@ def infer_event_from_messages(user):
         explicit_response=UserEventMessage.IS_OUTGOING
     ).order_by('-created_at').first()
 
-    event_id = latest_outgoing_message.event.id
+    event = latest_outgoing_message.event
 
-    return event_id
+    return event
 
 
 def save_event_message(user, event, text, direction, tz="America/Los_Angeles"):

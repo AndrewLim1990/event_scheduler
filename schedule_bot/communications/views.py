@@ -8,7 +8,7 @@ from django.views.decorators.http import require_POST
 from events.models import UserEvent
 from events.finite_state_machine import UserEventMachine
 from django.contrib.auth.models import User
-from communications.utils import infer_event_from_messages
+from communications.utils import infer_event_from_messages, save_event_message
 from communications.models import UserEventMessage
 
 
@@ -31,17 +31,17 @@ def twilio_webhook_view(request):
     print(f"From: {phone_number}")
     print(f"Message: {text}")
 
-    user = User.objects.filter(user_contact_info__whatsapp_phone_number=phone_number)
-    event_id = infer_event_from_messages(user)
-    # save_message(user, text, direction=UserEventMessage.IS_INCOMING)
-
     # Find the latest outgoing message to the user to determine event
-    event_id = 5
+    user = User.objects.get(user_contact_info__whatsapp_phone_number=phone_number)
+    event = infer_event_from_messages(user)
+
+    # Saves received message
+    save_event_message(user, event, text, direction=UserEventMessage.IS_INCOMING)
 
     # Get the UserEvent
     user_event = UserEvent.objects.get(
-        user__username=user,
-        event_id=event_id
+        user=user,
+        event=event
     )
     user_event_machine = UserEventMachine(user_event)
     user_event_machine.process_input_text(text)
