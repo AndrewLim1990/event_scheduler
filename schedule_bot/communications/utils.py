@@ -1,4 +1,6 @@
 from communications.models import UserEventMessage
+import datetime
+import pytz
 
 
 def infer_event_from_messages(user):
@@ -16,3 +18,25 @@ def infer_event_from_messages(user):
     event_id = latest_outgoing_message.event.id
 
     return event_id
+
+
+def save_event_message(user, event, text, direction, tz="America/Los_Angeles"):
+    """
+    Saves communication between app and user
+
+    :param user:
+    :param event:
+    :param text:
+    :param direction:
+    :param tz:
+    :return:
+    """
+    tz = pytz.timezone(tz)
+    user_event_message = UserEventMessage.create(
+        user=user,
+        event=event,
+        text=text,
+        created_at=datetime.datetime.now(tz),
+        direction=direction
+    )
+    user_event_message.save()
