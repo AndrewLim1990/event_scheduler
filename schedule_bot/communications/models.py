@@ -4,7 +4,7 @@ from events.models import Event
 
 
 class UserContactInfo(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="user_contact_info")
     whatsapp_phone_number = models.CharField(max_length=20, blank=True, null=True)
 
 
