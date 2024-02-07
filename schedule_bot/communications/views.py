@@ -16,6 +16,8 @@ client = Client(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_AUTH_TOKEN'
 @require_POST
 def twilio_webhook_view(request):
     """
+    Receives incoming text from user through Twilio webhook
+
     :param request:
     :return:
     """
@@ -25,6 +27,9 @@ def twilio_webhook_view(request):
     msg = data.get("Body")
     print(f"User: {user}")
     print(f"Message: {msg}")
+
+    determine_event()
+    save_messaage()
 
     # Find the latest outgoing message to the user to determine event
     event_id = 5
