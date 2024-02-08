@@ -12,7 +12,7 @@ def infer_event_from_messages(user):
     """
     latest_outgoing_message = UserEventMessage.objects.filter(
         user=user,
-        explicit_response=UserEventMessage.IS_OUTGOING
+        direction=UserEventMessage.IS_OUTGOING
     ).order_by('-created_at').first()
 
     event = latest_outgoing_message.event
@@ -32,7 +32,7 @@ def save_event_message(user, event, text, direction, tz="America/Los_Angeles"):
     :return:
     """
     tz = pytz.timezone(tz)
-    user_event_message = UserEventMessage.create(
+    user_event_message = UserEventMessage(
         user=user,
         event=event,
         text=text,
@@ -51,7 +51,7 @@ def send_message(user, event, text, tz="America/Los_Angeles"):
     :param tz:
     :return:
     """
-    user_contact_info = UserContactInfo.objects.get(user=user)
+    user_contact_info = UserContactInfo.objects.get_or_create(user=user)
 
     # Sends text
     print(text)
@@ -60,6 +60,6 @@ def send_message(user, event, text, tz="America/Los_Angeles"):
         user=user,
         event=event,
         text=text,
-        direction=UserEventMessage.IS_INCOMING,
+        direction=UserEventMessage.IS_OUTGOING,
         tz=tz
     )
