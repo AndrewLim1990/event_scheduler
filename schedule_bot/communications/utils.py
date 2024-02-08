@@ -1,4 +1,4 @@
-from communications.models import UserEventMessage
+from communications.models import UserEventMessage, UserContactInfo
 import datetime
 import pytz
 
@@ -40,3 +40,26 @@ def save_event_message(user, event, text, direction, tz="America/Los_Angeles"):
         direction=direction
     )
     user_event_message.save()
+
+
+def send_message(user, event, text, tz="America/Los_Angeles"):
+    """
+
+    :param user:
+    :param event:
+    :param text:
+    :param tz:
+    :return:
+    """
+    user_contact_info = UserContactInfo.objects.get(user=user)
+
+    # Sends text
+    print(text)
+
+    save_event_message(
+        user=user,
+        event=event,
+        text=text,
+        direction=UserEventMessage.IS_INCOMING,
+        tz=tz
+    )
