@@ -2,6 +2,8 @@ from availabilities.utils import check_availabilities
 from availabilities.utils import find_available_unseen_suggested_date
 from distutils.util import strtobool
 from django.contrib.auth.models import User
+
+from communications.utils import send_message
 from events.models import EventTime
 from events.models import UserEvent
 from events.models import UserEventTime
@@ -30,7 +32,13 @@ def send_suggestion_text(user_event_time):
 
     # Sends text
     username = user_event_time.user.username
-    print(f"{username}, would {event_time_start} to {event_time_end} work for you?")
+    text = f"{username}, would {event_time_start} to {event_time_end} work for you?"
+
+    send_message(
+        user=user_event_time.user,
+        event=user_event_time.event_time.event,
+        text=text
+    )
 
 
 def update_user_event_time_states(user_event_time, is_active, has_seen, explicit_response=UserEventTime.NO_RESPONSE):
@@ -186,7 +194,12 @@ class WaitingSuggestionState:
         :param user_event:
         :return:
         """
-        print("There are no viable event times, can you please suggest a time that works for you?")
+        text = "There are no viable event times, can you please suggest a time that works for you?"
+        send_message(
+            user=user_event.user,
+            event=user_event.event,
+            text=text
+        )
         update_user_event_state(user_event, state=UserEvent.WAITING_SUGGESTION)
 
     def process_input_text(self, machine, user_event, suggestion_text):
@@ -214,7 +227,12 @@ class WaitingSuggestionState:
         suggested_date.save()
 
         # Sends text
-        print(f"Did you mean: {suggested_start} - {suggested_end}?")
+        text = f"Did you mean: {suggested_start} - {suggested_end}?"
+        send_message(
+            user=user_event.user,
+            event=user_event.event,
+            text=text
+        )
 
         # Updates state
         machine.set_state(UserEvent.WAITING_VALIDATION)
@@ -278,10 +296,11 @@ class WaitingValidationState:
             suggested_date.is_verified = False
             suggested_date.save()
 
-            print(
-                "Sorry, can you please provide your suggested time in the format similar to:\n 2022-1-12 4PM to "
-                "2022-1-12 7PM "
+            text = (
+                "Sorry, can you please provide your suggested time in the format similar to:\n",
+                "2022-1-12 4PM to 2022-1-12 7PM "
             )
+            send_message(user=user_event.user, event=user_event.event, text=text)
 
             # Updates state
             machine.set_state(UserEvent.WAITING_SUGGESTION)
