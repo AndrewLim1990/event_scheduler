@@ -1,6 +1,12 @@
-from communications.models import UserEventMessage, UserContactInfo
-import datetime
+import os
 import pytz
+import datetime
+
+from communications.models import UserEventMessage
+from communications.models import UserContactInfo
+from twilio.rest import Client
+
+client = Client(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_AUTH_TOKEN'])
 
 
 def infer_event_from_messages(user):
@@ -51,10 +57,14 @@ def send_message(user, event, text, tz="America/Los_Angeles"):
     :param tz:
     :return:
     """
-    user_contact_info = UserContactInfo.objects.get_or_create(user=user)
+    user_phone_number = UserContactInfo.objects.get(user=user).whatsapp_phone_number
 
     # Sends text
-    print(text)
+    client.messages.create(
+        body=text,
+        from_="+16593992076",
+        to=user_phone_number
+    )
 
     save_event_message(
         user=user,

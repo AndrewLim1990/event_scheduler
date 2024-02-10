@@ -25,9 +25,8 @@ def twilio_webhook_view(request):
     :return:
     """
     # Obtains message information
-    data = json.loads(request.body)
-    phone_number = data.get("From")
-    text = data.get("Body")
+    text = request.POST.get('Body', '').lower()
+    phone_number = request.POST.get('From', '')
     print(f"From: {phone_number}")
     print(f"Message: {text}")
 
