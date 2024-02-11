@@ -100,3 +100,19 @@ def create_event(host_user, event_name, invitees, proposed_times):
         user_event_time.explicit_response = UserEventTime.CAN_COME
         user_event_time.save()
 
+
+def convert_to_human_readable_times(start_time, end_time):
+    """
+    Converts datetime.datetime to human-readable strings
+    :param start_time:
+    :param end_time:
+    :return:
+    """
+    readable_start_time = start_time.strftime('%b. %d, %Y %l:%M%p').replace("  ", " ")
+
+    if start_time.date() == end_time.date():
+        readable_end_time = end_time.strftime('%l:%M%p').replace("  ", " ").strip()
+    else:
+        readable_end_time = end_time.strftime('%b. %d, %Y %l:%M%p').replace("  ", " ")
+
+    return readable_start_time, readable_end_time
