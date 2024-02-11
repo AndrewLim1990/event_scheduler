@@ -1,9 +1,8 @@
 from availabilities.utils import check_availabilities
 from availabilities.utils import find_available_unseen_suggested_date
+from communications.utils import send_message
 from distutils.util import strtobool
 from django.contrib.auth.models import User
-
-from communications.utils import send_message
 from events.models import EventTime
 from events.models import UserEvent
 from events.models import UserEventTime
