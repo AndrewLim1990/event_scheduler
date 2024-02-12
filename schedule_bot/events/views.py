@@ -24,8 +24,8 @@ def event_initialization(request):
         proposed_times = []
         for start, end in event_times:
             proposed_times.append((
-                string_to_date_time(start),
-                string_to_date_time(end),
+                string_to_date_time(start)[0],
+                string_to_date_time(end)[0],
             ))
 
         # Creates Event and UserEvent associations for all participants

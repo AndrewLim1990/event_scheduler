@@ -1,7 +1,10 @@
 import datetime
+from collections import Counter
+
 import pandas as pd
 import parsedatetime
 import pytz
+import re
 
 from django.contrib.auth.models import User
 from events.models import Event, EventTime, UserEvent, UserEventTime
@@ -24,18 +27,31 @@ def string_to_date_time(input_string, tz="America/Los_Angeles"):
     """
     Translates input_string into datetime
     """
+    time_pattern = re.compile(
+        r'(\d{1,2}:\d{2})|'  # Matches times with colon.
+        r'(\d{1,2}\s*(AM|PM|am|pm))|'  # Matches times with AM/PM.
+        r'((?<=@)|(?<=at))\s*(\d{1,2})',  # Matches times indicated with "@" or "at".
+        re.IGNORECASE
+    )
+    contains_time = time_pattern.search(input_string)
+
     # Convert string to structtime
     cal = parsedatetime.Calendar()
     struct_time, __ = cal.parse(input_string)
 
     # Convert structtime to datetime
-    date_time = datetime.datetime(*struct_time[:5])
+    if contains_time:
+        # Obtains date with time
+        date_time = datetime.datetime(*struct_time[:5])
+    else:
+        # Obtains date without time
+        date_time = datetime.datetime(*struct_time[:3])
 
     # Localize time
     tz = pytz.timezone(tz)
     date_time = tz.localize(date_time)
 
-    return date_time
+    return date_time, contains_time
 
 
 def get_avg_event_duration(event):
@@ -116,3 +132,15 @@ def convert_to_human_readable_times(start_time, end_time):
         readable_end_time = end_time.strftime('%b. %d, %Y %l:%M%p').replace("  ", " ")
 
     return readable_start_time, readable_end_time
+
+
+def get_assumed_start_time(user_event):
+    """
+    :param user_event:
+    :return:
+    """
+    starts = UserEventTime.objects.filter(event_time__event=user_event.event).values_list("event_time__date_time_start", flat=True)
+    counts = Counter([start.time() for start in starts])
+    most_common_start_time = counts.most_common(1)[0][0]
+
+    return most_common_start_time

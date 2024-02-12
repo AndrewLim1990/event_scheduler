@@ -7,8 +7,9 @@ from events.models import EventTime
 from events.models import UserEvent
 from events.models import UserEventTime
 from events.models import SuggestedDate
-from events.utils import get_avg_event_duration
+from events.utils import get_avg_event_duration, get_assumed_start_time
 from events.utils import string_to_date_time
+from events.utils import convert_to_human_readable_times
 
 
 def get_current_active_user_event_time(user_event):
@@ -31,7 +32,16 @@ def send_suggestion_text(user_event_time):
 
     # Sends text
     username = user_event_time.user.username
-    text = f"{username}, would {event_time_start} to {event_time_end} work for you?"
+    host_name = UserEvent.objects.get(
+        event=user_event_time.event_time.event,
+        is_host=True
+    ).user.username
+    event_name = user_event_time.event_time.event.name
+    start_str, end_str = convert_to_human_readable_times(event_time_start, event_time_end)
+    text = (
+        f"Hi {username}! You've been invited to {event_name} by {host_name}. "
+        f"Would {start_str} to {end_str} work for you?"
+    )
 
     send_message(
         user=user_event_time.user,
@@ -211,7 +221,16 @@ class WaitingSuggestionState:
         :return:
         """
         # Interprets input text
-        suggested_start = string_to_date_time(suggestion_text)
+        suggested_start, contains_time = string_to_date_time(suggestion_text)
+        if not contains_time:
+            assumed_time = get_assumed_start_time(user_event)
+            suggested_start = suggested_start.replace(
+                hour=assumed_time.hour,
+                minute=assumed_time.minute,
+                second=assumed_time.second,
+                microsecond=assumed_time.microsecond
+            )
+
         duration = get_avg_event_duration(user_event.event)
         suggested_end = suggested_start + duration
 
@@ -226,7 +245,8 @@ class WaitingSuggestionState:
         suggested_date.save()
 
         # Sends text
-        text = f"Did you mean: {suggested_start} - {suggested_end}?"
+        readable_start, readable_end = convert_to_human_readable_times(suggested_start, suggested_end)
+        text = f"Did you mean: {readable_start} - {readable_end}?"
         send_message(
             user=user_event.user,
             event=user_event.event,
@@ -243,6 +263,21 @@ class WaitingForOthersState:
 
     def execute(self, user_event):
         update_user_event_state(user_event, state=UserEvent.WAITING_FOR_OTHERS)
+        text = "Great! Thank you for your response, we are now waiting on others to reply:"
+        unanswered_usernames = UserEvent.objects.filter(
+            event=user_event.event
+        ).exclude(
+            state=UserEvent.WAITING_FOR_OTHERS
+        ).values_list("user__username", flat=True)
+
+        for user_name in unanswered_usernames:
+            text += f"\n - {user_name}"
+
+        send_message(
+            user=user_event.user,
+            event=user_event.event,
+            text=text
+        )
 
 
 class WaitingValidationState:
