@@ -1,7 +1,8 @@
-from availabilities.utils import check_availabilities
+import pandas as pd
+
+from availabilities.utils import check_availabilities, process_str_to_bool
 from availabilities.utils import find_available_unseen_suggested_date
 from communications.utils import send_message
-from distutils.util import strtobool
 from django.contrib.auth.models import User
 from events.models import EventTime
 from events.models import UserEvent
@@ -166,7 +167,16 @@ class WaitingResponseState:
         :return:
         """
         # Processes input text
-        explicit_response = UserEventTime.CAN_COME if strtobool(input_text) else UserEventTime.CANNOT_COME
+        try:
+            explicit_response = UserEventTime.CAN_COME if process_str_to_bool(input_text) else UserEventTime.CANNOT_COME
+        except ValueError:
+            send_message(
+                user=user_event.user,
+                event=user_event.event,
+                text=f"Sorry, we could not process '{input_text}', please respond with 'yes' or 'no'"
+            )
+            return
+
         user_event_time = get_current_active_user_event_time(user_event)
         update_user_event_time_states(
             user_event_time,
@@ -263,15 +273,29 @@ class WaitingForOthersState:
 
     def execute(self, user_event):
         update_user_event_state(user_event, state=UserEvent.WAITING_FOR_OTHERS)
-        text = "Great! Thank you for your response, we are now waiting on others to reply:"
         unanswered_usernames = UserEvent.objects.filter(
             event=user_event.event
         ).exclude(
             state=UserEvent.WAITING_FOR_OTHERS
         ).values_list("user__username", flat=True)
 
-        for user_name in unanswered_usernames:
-            text += f"\n - {user_name}"
+        if unanswered_usernames:
+            text = "Great! Thank you fo1`r your response, we are now waiting on others to reply:"
+            for user_name in unanswered_usernames:
+                text += f"\n - {user_name}"
+        else:
+            user_event_time_df = pd.DataFrame(UserEventTime.objects.filter(
+                event_time__event=user_event.event
+            ).values())
+            user_event_time_df = user_event_time_df.groupby("event_time_id")["explicit_response"].apply(list)
+            user_event_time_df = user_event_time_df.reset_index()
+            user_event_time_df["all_can_come"] = user_event_time_df["explicit_response"].apply(
+                lambda responses: all([response == UserEventTime.CAN_COME for response in responses])
+            )
+            valid_event_time_id = user_event_time_df.query("all_can_come")["event_time_id"].values[0]
+            event_time = EventTime.objects.get(id=valid_event_time_id)
+            start, end = convert_to_human_readable_times(event_time.date_time_start, event_time.date_time_end)
+            text = f"Great! Looks like you guys are set for: {start} - {end}"
 
         send_message(
             user=user_event.user,
@@ -296,7 +320,15 @@ class WaitingValidationState:
         :return:
         """
         # Processes input text
-        is_valid_response = strtobool(validation_response)
+        try:
+            is_valid_response = process_str_to_bool(validation_response)
+        except ValueError:
+            send_message(
+                user=user_event.user,
+                event=user_event.event,
+                text=f"Sorry, we could not process '{validation_response}', please respond with 'yes' or 'no'"
+            )
+            return
 
         # Saves if correct
         if is_valid_response:
