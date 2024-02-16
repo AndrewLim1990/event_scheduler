@@ -112,3 +112,28 @@ def find_available_unseen_suggested_date(user_event):
     ))
 
     return valid_user_event_times
+
+
+def process_str_to_bool(text):
+    """
+
+    :param text:
+    :return:
+    """
+    text = text.lower()
+    positive_text = [
+        "yes", "yeah", "yep", "yup", "true", "i can", "i can make it", "affirmative",
+        "absolutely", "definitely", "y", "of course", "sure thing", "indeed", "positive",
+        "right"
+    ]
+    negative_text = [
+        "no", "nope", "not at all", "negative", "no way", "certainly not", "i can't make it",
+        "i can't", "i don't think so", "never"
+    ]
+
+    if text in positive_text:
+        return True
+    elif text in negative_text:
+        return False
+    else:
+        raise ValueError("Input text must be an obvious 'yes' or 'no' like text")
