@@ -5,10 +5,10 @@
 {% block content %}
 <h2>{{ event.name }}</h2>
 
-<h3>Event Statusezs</h3>
+<h3>Guest List</h3>
 <ul>
     {% for user_event in user_events %}
-    <li>{{ user_event.user }}</li>
+    <li>{{ user_event.user }} ({{ user_event.state }})</li>
     {% empty %}
     <li>No Users Yet.</li>
     {% endfor %}

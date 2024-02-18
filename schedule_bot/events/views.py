@@ -58,8 +58,7 @@ def event_invite(request, uuid):
     if request.method == 'POST':
         form = RegistrationForm(request.POST, event=event)
         if form.is_valid():
-            # Process registration or sign-in
-            # For new users, you might create a new User instance
+            form.save()
             return redirect('event_detail', event_id=event.id)  # Redirect to event detail or confirmation page
     else:
         form = RegistrationForm(event=event)
