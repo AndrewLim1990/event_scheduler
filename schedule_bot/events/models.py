@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -8,6 +9,10 @@ class Event(models.Model):
     Represents a specific event
     """
     name = models.CharField(max_length=512, null=True, default=None)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+
+    def get_invite_url(self):
+        return f"/events/invite/{self.uuid}/"
 
 
 class EventTime(models.Model):

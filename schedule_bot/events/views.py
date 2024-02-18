@@ -1,4 +1,8 @@
 from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404, render, redirect
+
+from events.forms import RegistrationForm
+from events.models import Event
 from events.utils import create_event
 from events.utils import string_to_date_time
 from rest_framework.decorators import api_view
@@ -46,3 +50,18 @@ def event_initialization(request):
 
     # Handle unsupported methods
     return Response({"error": "Method not allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+def event_invite(request, uuid):
+    event = get_object_or_404(Event, uuid=uuid)
+
+    if request.method == 'POST':
+        form = RegistrationForm(request.POST, event=event)
+        if form.is_valid():
+            # Process registration or sign-in
+            # For new users, you might create a new User instance
+            return redirect('event_detail', event_id=event.id)  # Redirect to event detail or confirmation page
+    else:
+        form = RegistrationForm(event=event)
+
+    return render(request, 'events/invite.html', {'form': form, 'event': event})
