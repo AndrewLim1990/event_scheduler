@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
 
 from events.forms import RegistrationForm
-from events.models import Event
+from events.models import Event, UserEvent
 from events.utils import create_event
 from events.utils import string_to_date_time
 from rest_framework.decorators import api_view
@@ -65,3 +65,18 @@ def event_invite(request, uuid):
         form = RegistrationForm(event=event)
 
     return render(request, 'events/invite.html', {'form': form, 'event': event})
+
+
+def event_detail(request, event_id):
+    """
+    Display the details of a specific event.
+    """
+    event = get_object_or_404(Event, id=event_id)
+    # Assuming UserEvent model links users to events, and you want to show attendees
+    user_events = UserEvent.objects.filter(event=event)
+    print(user_events)
+
+    return render(request, 'events/event_detail.html', {
+        'event': event,
+        'user_events': user_events
+    })
