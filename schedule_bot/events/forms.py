@@ -10,21 +10,27 @@ class RegistrationForm(forms.ModelForm):
         self.event = kwargs.pop('event', None)  # Pop the event from kwargs and store it
         super(RegistrationForm, self).__init__(*args, **kwargs)
         self.fields['first_name'].required = True
+        self.fields['last_name'].required = True
         self.fields['email'].required = True
 
     phone_regex = RegexValidator(
         regex=r'^\+?1?\d{9,15}$',
         message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed."
     )
-    whatsapp_phone_number = forms.CharField(validators=[phone_regex], max_length=20, required=False)
+    whatsapp_phone_number = forms.CharField(
+        validators=[phone_regex],
+        max_length=20,
+        required=False,
+        label="Phone Number"
+    )
 
     class Meta:
         model = User
-        fields = ('first_name', 'email')
+        fields = ('first_name', 'last_name', 'email')
 
     def save(self, commit=True):
         user = super(RegistrationForm, self).save(commit=False)
-        user.username = self.cleaned_data['email']  # Using email as username
+        user.username = self.cleaned_data['first_name'] + ' ' + self.cleaned_data['last_name']
         if commit:
             user.save()
             # Create or update the UserContactInfo instance
