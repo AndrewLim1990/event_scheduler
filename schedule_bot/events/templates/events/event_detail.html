@@ -14,4 +14,22 @@
     <li>No Users Yet.</li>
     {% endfor %}
 </ul>
+
+<form method="post">
+    {% csrf_token %}
+    {% if is_participant %}
+        <button type="submit" name="remove_self">Leave Event</button>
+    {% else %}
+        <button type="submit" name="add_self">Join Event</button>
+    {% endif %}
+</form>
+
+{% if form %}
+    <h3>Add Participant</h3>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" name="add_participant">Add</button>
+    </form>
+{% endif %}
 {% endblock %}

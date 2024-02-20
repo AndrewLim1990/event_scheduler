@@ -1,6 +1,7 @@
 import requests
 
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render, redirect
 from events.forms import RegistrationForm
 from events.models import Event, UserEvent
@@ -72,20 +73,45 @@ def event_invite(request, uuid):
     return render(request, 'events/invite.html', {'form': form, 'event': event})
 
 
+@login_required
 def event_detail(request, event_id):
     """
     Display the details of a specific event.
     """
     event = get_object_or_404(Event, id=event_id)
+    form = RegistrationForm(request.POST or None, event=event)
+
     # Assuming UserEvent model links users to events, and you want to show attendees
     user_events = UserEvent.objects.filter(event=event)
     invite_url = event.get_invite_url()
     invite_url = request.build_absolute_uri(invite_url)
+    is_participant = UserEvent.objects.filter(user=request.user, event=event).exists()
+
+    if request.method == 'POST':
+        if "remove_self" in request.POST:
+            user_event = UserEvent.objects.get(
+                user=request.user,
+                event=event
+            )
+            user_event.delete()
+        elif "add_self" in request.POST:
+            user_event = UserEvent(
+                user=request.user,
+                event=event,
+                is_required=True,
+                is_host=False
+            )
+            user_event.save()
+        elif "add_participant" in request.POST and form.is_valid():
+            form.save()
+        return redirect('event_detail', event_id=event.id)  # Redirect to event detail or confirmation page
 
     return render(request, 'events/event_detail.html', {
         'event': event,
+        'form': form,
         'user_events': user_events,
-        'event_invite_url': invite_url
+        'event_invite_url': invite_url,
+        'is_participant': is_participant
     })
 
 
