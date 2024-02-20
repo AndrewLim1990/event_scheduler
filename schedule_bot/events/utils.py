@@ -116,6 +116,8 @@ def create_event(host_user, event_name, invitees, proposed_times):
         user_event_time.explicit_response = UserEventTime.CAN_COME
         user_event_time.save()
 
+    return event
+
 
 def convert_to_human_readable_times(start_time, end_time):
     """
