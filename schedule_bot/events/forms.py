@@ -29,7 +29,6 @@ class RegistrationForm(forms.ModelForm):
         fields = ('first_name', 'last_name', 'email')
 
     def save(self, commit=True):
-        print("HALLLOOOOO")
         user = super(RegistrationForm, self).save(commit=False)
         user.username = self.cleaned_data['first_name'] + ' ' + self.cleaned_data['last_name']
         if commit:

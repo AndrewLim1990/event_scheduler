@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
-from .forms import SignUpForm
+from accounts.forms import SignUpForm
 from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
 
@@ -12,7 +12,7 @@ def signup_view(request):
             form.save()
             email = form.cleaned_data.get('email')
             raw_password = form.cleaned_data.get('password1')
-            user = authenticate(email=email, password=raw_password)
+            user = authenticate(username=email, password=raw_password)
             login(request, user)
             return redirect('home')
     else:
