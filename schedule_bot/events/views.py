@@ -104,6 +104,12 @@ def event_detail(request, event_id):
             user_event.save()
         elif "add_participant" in request.POST and form.is_valid():
             form.save()
+        elif "remove_participant_id" in request.POST:
+            user_event = UserEvent.objects.get(
+                user=request.POST["remove_participant_id"],
+                event=event
+            )
+            user_event.delete()
         return redirect('event_detail', event_id=event.id)  # Redirect to event detail or confirmation page
 
     return render(request, 'events/event_detail.html', {

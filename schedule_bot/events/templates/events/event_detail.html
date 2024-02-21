@@ -9,7 +9,15 @@
 <h3>Guest List</h3>
 <ul>
     {% for user_event in user_events %}
-    <li>{{ user_event.user }} ({{ user_event.state }})</li>
+    <li>
+        {{ user_event.user }} ({{ user_event.state }})
+        <!-- Enclose each input and button in a form element -->
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="remove_participant_id" value="{{ user_event.user.id }}">
+            <button type="submit">Remove</button>
+        </form>
+    </li>
     {% empty %}
     <li>No Users Yet.</li>
     {% endfor %}
