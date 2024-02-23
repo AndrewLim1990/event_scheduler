@@ -87,6 +87,10 @@ def event_detail(request, event_id):
     invite_url = request.build_absolute_uri(invite_url)
     is_participant = UserEvent.objects.filter(user=request.user, event=event).exists()
 
+    # Checks to see if user is part of event
+    if not is_participant:
+        return render(request, 'events/event_access_denied.html', status=403)
+
     if request.method == 'POST':
         if "remove_self" in request.POST:
             user_event = UserEvent.objects.get(
