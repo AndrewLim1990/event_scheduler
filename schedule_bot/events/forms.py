@@ -52,6 +52,6 @@ class RegistrationForm(forms.ModelForm):
 class EventCreationForm(forms.Form):
     event_name = forms.CharField(label='Event Name', max_length=100)
     event_times = forms.CharField(
-        widget=forms.Textarea,
-        help_text='Enter proposed times as start-end pairs separated by commas.'
+        widget=forms.TextInput(attrs={'placeholder': 'Select event times'}),
+        help_text='Click to select start and end times for your event.'
     )
