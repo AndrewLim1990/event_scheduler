@@ -30,7 +30,7 @@ class RegistrationForm(forms.ModelForm):
 
     def save(self, commit=True):
         user = super(RegistrationForm, self).save(commit=False)
-        user.username = self.cleaned_data['first_name'] + ' ' + self.cleaned_data['last_name']
+        user.username = self.cleaned_data['email']
         if commit:
             user.save()
             # Create or update the UserContactInfo instance
