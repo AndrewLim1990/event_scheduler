@@ -51,7 +51,11 @@ class RegistrationForm(forms.ModelForm):
 
 class EventCreationForm(forms.Form):
     event_name = forms.CharField(label='Event Name', max_length=100)
-    event_times = forms.CharField(
-        widget=forms.TextInput(attrs={'placeholder': 'Select event times'}),
-        help_text='Click to select start and end times for your event.'
+    event_times = forms.DateTimeField(
+        widget=forms.HiddenInput(attrs={'class': 'hidden-date-input', 'placeholder': 'Select event date'})
+    )
+    event_duration = forms.IntegerField(
+        label='Event Duration (minutes)',
+        min_value=1,
+        help_text='Duration in minutes.'
     )

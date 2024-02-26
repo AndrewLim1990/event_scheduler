@@ -18,14 +18,34 @@
 {{ block.super }}
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    flatpickr("input[name='event_times']", {
-        enableTime: true,
-        dateFormat: "Y-m-d H:i",
-<!--        mode: "multiple",-->
-        minDate: "today",
-<!--        defaultDate: "today"-->
-    });
+flatpickr("input[name='event_times']", {
+    enableTime: true,
+    dateFormat: "Y-m-d H:i",
+    inline: true
 });
 </script>
+<style>
+    /* Customizing Flatpickr Calendar Size */
+    .flatpickr-calendar {
+        width: 700px; /* Adjust the calendar width */
+        /* Optional: Adjust the height */
+    }
+    .flatpickr-calendar .flatpickr-days {
+        width: 100%;
+    }
+    .flatpickr-calendar .dayContainer {
+        width: 100%;
+        max-width: 100%;
+    }
+    /* Adjusting the size of the calendar cells (days) */
+    .flatpickr-calendar .flatpickr-day {
+        width: calc(700px / 7); /* 7 days in a week */
+        height: 40px; /* Adjust the day cell height */
+        line-height: 40px; /* Center the day number vertically */
+        max-width: 100%;
+    }
+    .hidden-date-input {
+        display: none;
+    }
+</style>
 {% endblock extra_js %}

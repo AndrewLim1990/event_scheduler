@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load custom_tags %}
+
 {% block title %}Event Details{% endblock %}
 
 {% block content %}
@@ -32,6 +34,28 @@
     {% endif %}
 </form>
 
+<h3>Suggested Dates and Responses</h3>
+<table>
+    <thead>
+        <tr>
+            <th>Date</th>
+            {% for user_event in user_events %}
+                <th>{{ user_event.user.first_name }} {{ user_event.user.last_name }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for date in suggested_times %}
+        <tr>
+            <td>{{ date }}</td>
+            {% for user_event in user_events %}
+                <td>{{ responses|get_by_key:user_event.user.id|get_by_key:date }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
 {% if form %}
     <h3>Add Participant</h3>
     <form method="post">
@@ -41,3 +65,26 @@
     </form>
 {% endif %}
 {% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+     /* Adding styles for table borders and centered text */
+    table {
+        border-collapse: collapse; /* Collapse borders */
+        table-layout: fixed;
+    }
+    th, td {
+        border: 1px solid #ddd; /* Light grey border */
+        text-align: center; /* Center-align text */
+        padding: 8px; /* Add some padding */
+        max-width: 160px;
+    }
+    th {
+        background-color: #f2f2f2; /* Light grey background for headers */
+    }
+    th:first-child, td:first-child {
+        width: 160px;
+    }
+</style>
+{% endblock extra_css %}

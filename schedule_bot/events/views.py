@@ -1,17 +1,21 @@
+from collections import defaultdict
+
+import pandas as pd
 import requests
 
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render, redirect
 from events.forms import RegistrationForm
-from events.models import Event, UserEvent
-from events.utils import create_event
+from events.models import Event, UserEvent, UserEventTime
+from events.utils import create_event, convert_to_human_readable_times
 from events.utils import string_to_date_time
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from events.forms import EventCreationForm
 from django.urls import reverse
+from datetime import timedelta
 
 
 @api_view(['POST'])
@@ -81,15 +85,39 @@ def event_detail(request, event_id):
     event = get_object_or_404(Event, id=event_id)
     form = RegistrationForm(request.POST or None, event=event)
 
+    # Checks to see if user is part of event
+    is_participant = UserEvent.objects.filter(user=request.user, event=event).exists()
+    if not is_participant:
+        return render(request, 'events/event_access_denied.html', status=403)
+
     # Assuming UserEvent model links users to events, and you want to show attendees
     user_events = UserEvent.objects.filter(event=event)
     invite_url = event.get_invite_url()
     invite_url = request.build_absolute_uri(invite_url)
-    is_participant = UserEvent.objects.filter(user=request.user, event=event).exists()
 
-    # Checks to see if user is part of event
-    if not is_participant:
-        return render(request, 'events/event_access_denied.html', status=403)
+    # Obtains responses for event
+    responses = pd.DataFrame(UserEventTime.objects.filter(
+        event_time__event=event
+    ).values(
+        "user__id",
+        "event_time__date_time_start",
+        "event_time__date_time_end",
+        "explicit_response",
+    ))
+
+    # Converts to human readable times
+    suggested_times = [
+        convert_to_human_readable_times(row["event_time__date_time_start"], row["event_time__date_time_end"])
+        for idx, row in responses.iterrows()
+    ]
+    suggested_times = [x[0] + " to " + x[1] for x in suggested_times]
+    responses["suggested_time"] = suggested_times
+    suggested_times = list(set(suggested_times))
+
+    response_dict = defaultdict(dict)
+    for idx, row in responses.iterrows():
+        response_dict[row["user__id"]][row["suggested_time"]] = row["explicit_response"]
+    response_dict = dict(response_dict)
 
     if request.method == 'POST':
         if "remove_self" in request.POST:
@@ -121,7 +149,9 @@ def event_detail(request, event_id):
         'form': form,
         'user_events': user_events,
         'event_invite_url': invite_url,
-        'is_participant': is_participant
+        'is_participant': is_participant,
+        'responses': response_dict,
+        'suggested_times': suggested_times
     })
 
 
@@ -131,14 +161,13 @@ def create_event_view(request):
         if form.is_valid():
             user_id = request.user.id
             event_name = form.cleaned_data['event_name']
-            event_times = form.cleaned_data['event_times']
+            event_time_start = form.cleaned_data['event_times']
+            event_duration = form.cleaned_data["event_duration"]
+            event_time_end = event_time_start + timedelta(minutes=event_duration)
+            print(f"Event Times: {event_time_start} - {event_time_end}")
 
             # Convert event_times and invitee_ids to the required format
-            event_times_list = [event_time.strip() for event_time in event_times.split(',')]
-            event_times_list = [
-                (event_times_list[idx], event_times_list[idx+1])
-                for idx in range(0, len(event_times_list), 2)
-            ]
+            event_times_list = [(str(event_time_start), str(event_time_end))]
 
             # Prepare the data for the API request
             data = {

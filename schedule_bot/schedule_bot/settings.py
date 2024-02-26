@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'communications',
     'events',
     'rest_framework',
+    'schedule_bot',
     'templates'
 ]
 
