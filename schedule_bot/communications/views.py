@@ -31,7 +31,7 @@ def twilio_webhook_view(request):
     print(f"Message: {text}")
 
     # Find the latest outgoing message to the user to determine event
-    user = User.objects.get(user_contact_info__whatsapp_phone_number=phone_number)
+    user = User.objects.get(user_contact_info__phone_number=phone_number)
     event = infer_event_from_messages(user)
 
     # Saves received message

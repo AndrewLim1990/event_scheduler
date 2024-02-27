@@ -17,7 +17,7 @@ class RegistrationForm(forms.ModelForm):
         regex=r'^\+?1?\d{9,15}$',
         message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed."
     )
-    whatsapp_phone_number = forms.CharField(
+    phone_number = forms.CharField(
         validators=[phone_regex],
         max_length=20,
         required=False,
@@ -36,7 +36,7 @@ class RegistrationForm(forms.ModelForm):
             # Create or update the UserContactInfo instance
             UserContactInfo.objects.update_or_create(
                 user=user,
-                defaults={'whatsapp_phone_number': self.cleaned_data.get('whatsapp_phone_number')}
+                defaults={'phone_number': self.cleaned_data.get('phone_number')}
             )
             UserEvent.objects.update_or_create(
                 user=user,

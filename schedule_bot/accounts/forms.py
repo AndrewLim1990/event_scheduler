@@ -39,6 +39,6 @@ class SignUpForm(UserCreationForm):
             # Create or update the UserContactInfo instance
             UserContactInfo.objects.update_or_create(
                 user=user,
-                defaults={'whatsapp_phone_number': self.cleaned_data.get('phone_number')}
+                defaults={'phone_number': self.cleaned_data.get('phone_number')}
             )
         return user
