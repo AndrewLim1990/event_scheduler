@@ -57,7 +57,7 @@ def send_message(user, event, text, tz="America/Los_Angeles"):
     :param tz:
     :return:
     """
-    user_phone_number = UserContactInfo.objects.get(user=user).whatsapp_phone_number
+    user_phone_number = UserContactInfo.objects.get(user=user).phone_number
 
     # Sends text
     client.messages.create(

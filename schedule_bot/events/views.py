@@ -1,8 +1,4 @@
 from collections import defaultdict
-
-import pandas as pd
-import requests
-
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render, redirect
@@ -16,6 +12,9 @@ from rest_framework import status
 from events.forms import EventCreationForm
 from django.urls import reverse
 from datetime import timedelta
+
+import pandas as pd
+import requests
 
 
 @api_view(['POST'])
@@ -105,7 +104,7 @@ def event_detail(request, event_id):
         "explicit_response",
     ))
 
-    # Converts to human readable times
+    # Converts to humanreadable times
     suggested_times = [
         convert_to_human_readable_times(row["event_time__date_time_start"], row["event_time__date_time_end"])
         for idx, row in responses.iterrows()
