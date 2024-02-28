@@ -4,7 +4,7 @@
 <h1>Welcome to SyncingUp</h1>
 
 {% if user.is_authenticated %}
-    <p>Hello, {{ user.get_username }}!</p>
+    <p>Hello, {{ user.first_name }} {{ user.last_name }}!</p>
     <h2>Your Active Events</h2>
     <ul>
         {% for user_event in user_events %}

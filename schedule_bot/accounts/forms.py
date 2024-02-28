@@ -32,13 +32,26 @@ class SignUpForm(UserCreationForm):
 
     def save(self, commit=True):
         user = super(SignUpForm, self).save(commit=False)
-        user.username = self.cleaned_data["email"]
+        user.username = self.cleaned_data["phone_number"]
         user.set_password(self.cleaned_data["password1"])
+        user_has_acc = False
         if commit:
-            user.save()
+            user_exists = User.objects.filter(username=user.username).exists()
+            if not user_exists:
+                user.save()
+            elif User.objects.get(username=user.username).password != "":
+                user_has_acc = True
+                user = User.objects.get(username=user.username)
+                user.save()
+            else:
+                user = User.objects.get(username=user.username)
+                user.username = self.cleaned_data["phone_number"]
+                user.set_password(self.cleaned_data["password1"])
+                user.save()
+
             # Create or update the UserContactInfo instance
             UserContactInfo.objects.update_or_create(
                 user=user,
                 defaults={'phone_number': self.cleaned_data.get('phone_number')}
             )
-        return user
+        return user, user_has_acc

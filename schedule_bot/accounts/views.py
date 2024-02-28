@@ -9,7 +9,9 @@ def signup_view(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
-            form.save()
+            _, user_has_acc = form.save()
+            if user_has_acc:
+                return redirect('existing_account_already')
             email = form.cleaned_data.get('email')
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=email, password=raw_password)
@@ -22,6 +24,14 @@ def signup_view(request):
 
 class MyLoginView(LoginView):
     template_name = 'accounts/login.html'
+
+    def get_success_url(self):
+        # You can include any logic here to determine the redirect URL
+        return reverse_lazy('home')
+
+
+class ExistingAccountAlready(LoginView):
+    template_name = 'accounts/existing_account_already.html'
 
     def get_success_url(self):
         # You can include any logic here to determine the redirect URL

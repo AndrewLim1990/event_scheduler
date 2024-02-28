@@ -12,7 +12,7 @@
 <ul>
     {% for user_event in user_events %}
     <li>
-        {{ user_event.user }} ({{ user_event.state }})
+        {{ user_event.user.first_name }} {{ user_event.user.last_name }} ({{ user_event.state }})
         <!-- Enclose each input and button in a form element -->
         <form method="post">
             {% csrf_token %}

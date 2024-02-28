@@ -11,7 +11,6 @@ class RegistrationForm(forms.ModelForm):
         super(RegistrationForm, self).__init__(*args, **kwargs)
         self.fields['first_name'].required = True
         self.fields['last_name'].required = True
-        self.fields['email'].required = True
 
     phone_regex = RegexValidator(
         regex=r'^\+?1?\d{9,15}$',
@@ -26,13 +25,19 @@ class RegistrationForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email')
+        fields = ('first_name', 'last_name')
 
     def save(self, commit=True):
         user = super(RegistrationForm, self).save(commit=False)
-        user.username = self.cleaned_data['email']
+        user.username = self.cleaned_data['phone_number']
         if commit:
-            user.save()
+            user_exists = User.objects.filter(username=user.username).exists()
+            if not user_exists:
+                user.save()
+            else:
+                user = User.objects.get(username=self.cleaned_data['phone_number'])
+                user.save()
+
             # Create or update the UserContactInfo instance
             UserContactInfo.objects.update_or_create(
                 user=user,
