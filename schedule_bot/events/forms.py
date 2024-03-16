@@ -29,15 +29,16 @@ class RegistrationForm(forms.ModelForm):
 
     def save(self, commit=True):
         user = super(RegistrationForm, self).save(commit=False)
-        user.username = self.cleaned_data['phone_number']
+        phone_number = self.cleaned_data['phone_number']
         if commit:
-            user_exists = Member.objects.filter(username=user.username).exists()
+            user_exists = UserContactInfo.objects.filter(phone_number=phone_number).exists()
             if not user_exists:
                 if user.email == "":
                     user.email = None
+                user.username = phone_number
                 user.save()
             else:
-                user = Member.objects.get(username=self.cleaned_data['phone_number'])
+                user = UserContactInfo.objects.get(phone_number=phone_number).user
                 user.save()
 
             # Create or update the UserContactInfo instance
