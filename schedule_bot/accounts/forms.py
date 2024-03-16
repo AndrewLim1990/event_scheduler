@@ -40,7 +40,15 @@ class SignUpForm(UserCreationForm):
         user.username = self.cleaned_data["email"]
         user.email = self.cleaned_data["email"]
         user.set_password(self.cleaned_data["password1"])
+        phone_number = self.cleaned_data.get('phone_number')
+
         if commit:
+            user_exists = UserContactInfo.objects.filter(phone_number=phone_number).exists()
+            if user_exists:
+                user = UserContactInfo.objects.get(phone_number=phone_number).user
+                user.username = self.cleaned_data["email"]
+                user.email = self.cleaned_data["email"]
+                user.set_password(self.cleaned_data["password1"])
             user.save()
 
             # Create or update the UserContactInfo instance
