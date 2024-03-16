@@ -370,7 +370,3 @@ class WaitingValidationState:
 
             # Updates state
             machine.set_state(UserEvent.WAITING_SUGGESTION)
-
-
-
-
