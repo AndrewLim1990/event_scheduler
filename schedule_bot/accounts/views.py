@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
-from accounts.forms import SignUpForm
+from accounts.forms import SignUpForm, EmailAuthenticationForm
 from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
 
@@ -8,10 +8,9 @@ from django.urls import reverse_lazy
 def signup_view(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
+
         if form.is_valid():
-            _, user_has_acc = form.save()
-            if user_has_acc:
-                return redirect('existing_account_already')
+            form.save()
             email = form.cleaned_data.get('email')
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=email, password=raw_password)
@@ -24,9 +23,9 @@ def signup_view(request):
 
 class MyLoginView(LoginView):
     template_name = 'accounts/login.html'
+    authentication_form = EmailAuthenticationForm
 
     def get_success_url(self):
-        # You can include any logic here to determine the redirect URL
         return reverse_lazy('home')
 
 

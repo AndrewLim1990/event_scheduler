@@ -1,6 +1,6 @@
 from availabilities.models import Availability
 from collections import defaultdict
-from django.contrib.auth.models import User
+from accounts.models import Member
 from events.models import UserEventTime
 from events.utils import get_all_event_participants
 from events.models import EventTime
@@ -36,7 +36,7 @@ def get_users_declined(event_time):
         user__in=participants,
         explicit_response=UserEventTime.CANNOT_COME
     ).values_list("user_id", flat=True))
-    users_declined = list(User.objects.filter(id__in=user_ids))
+    users_declined = list(Member.objects.filter(id__in=user_ids))
 
     return users_declined
 

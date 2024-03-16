@@ -1,6 +1,6 @@
 import uuid
 from django.db import models
-from django.contrib.auth.models import User
+from accounts.models import Member
 
 
 # Create your models here.
@@ -29,7 +29,7 @@ class UserEventTime(models.Model):
     Represents relation between a User and an EventTime
     """
     event_time = models.ForeignKey(EventTime, on_delete=models.CASCADE, related_name="user_event_time")
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_event_time")
+    user = models.ForeignKey(Member, on_delete=models.CASCADE, related_name="user_event_time")
     is_active = models.BooleanField(default=False)
     has_seen = models.BooleanField(default=False)
 
@@ -67,7 +67,7 @@ class UserEvent(models.Model):
     ]
     state = models.CharField(choices=STATE_CHOICES, max_length=256, null=True, default=NO_COMMUNICATION)
 
-    user = models.ForeignKey(User, related_name="events", on_delete=models.CASCADE)
+    user = models.ForeignKey(Member, related_name="events", on_delete=models.CASCADE)
     event = models.ForeignKey(Event, related_name="users", on_delete=models.CASCADE)
     is_required = models.BooleanField()
     is_host = models.BooleanField()

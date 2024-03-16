@@ -6,7 +6,7 @@ import parsedatetime
 import pytz
 import re
 
-from django.contrib.auth.models import User
+from accounts.models import Member
 from events.models import Event, EventTime, UserEvent, UserEventTime
 
 
@@ -18,7 +18,7 @@ def get_all_event_participants(event):
     :return: list of User objects
     """
     user_ids = list(Event.objects.filter(id=event.id).values_list("users__user_id", flat=True))
-    participants = list(User.objects.filter(id__in=user_ids))
+    participants = list(Member.objects.filter(id__in=user_ids))
 
     return participants
 

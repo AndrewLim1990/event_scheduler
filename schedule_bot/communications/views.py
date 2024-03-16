@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from events.models import UserEvent
 from events.finite_state_machine import UserEventMachine
-from django.contrib.auth.models import User
+from accounts.models import Member
 from communications.utils import infer_event_from_messages, save_event_message
 from communications.models import UserEventMessage
 
@@ -31,7 +31,7 @@ def twilio_webhook_view(request):
     print(f"Message: {text}")
 
     # Find the latest outgoing message to the user to determine event
-    user = User.objects.get(user_contact_info__phone_number=phone_number)
+    user = Member.objects.get(user_contact_info__phone_number=phone_number)
     event = infer_event_from_messages(user)
 
     # Saves received message

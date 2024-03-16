@@ -3,7 +3,7 @@ import pandas as pd
 from availabilities.utils import check_availabilities, process_str_to_bool
 from availabilities.utils import find_available_unseen_suggested_date
 from communications.utils import send_message
-from django.contrib.auth.models import User
+from accounts.models import Member
 from events.models import EventTime
 from events.models import UserEvent
 from events.models import UserEventTime
@@ -107,11 +107,11 @@ class UserEventMachine:
         """
         event = self.user_event.event
         if identifier_type == "phone_number":
-            invitee, __ = User.objects.get_or_create(user_info__phone_number=identifier)
+            invitee, __ = Member.objects.get_or_create(user_info__phone_number=identifier)
         elif identifier_type == "email":
-            invitee, __ = User.objects.get_or_create(email=identifier)
+            invitee, __ = Member.objects.get_or_create(email=identifier)
         elif identifier_type == "username":
-            invitee, __ = User.objects.get_or_create(username=identifier)
+            invitee, __ = Member.objects.get_or_create(username=identifier)
         else:
             raise NotImplementedError(f"Cannot invite user of identifier_type: {identifier_type}")
         invitee_user_event, __ = UserEvent.objects.update_or_create(

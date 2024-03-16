@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from accounts.models import Member
 from phonenumber_field.modelfields import PhoneNumberField
 
 
@@ -7,7 +7,7 @@ class Availability(models.Model):
     """
     Represents User availability independent of a specific event
     """
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(Member, on_delete=models.CASCADE)
     category = models.CharField(default=None, null=True, max_length=512)
     is_available = models.BooleanField()
 
@@ -67,5 +67,5 @@ class WeekAvailability(Availability):
 
 
 class UserInformation(models.Model):
-    user = models.OneToOneField(User, related_name="user_information", on_delete=models.CASCADE)
+    user = models.OneToOneField(Member, related_name="user_information", on_delete=models.CASCADE)
     phone_number = PhoneNumberField(null=True, unique=True, default=None)

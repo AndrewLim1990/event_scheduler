@@ -140,5 +140,13 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+AUTHENTICATION_BACKENDS = [
+    'schedule_bot.backends.EmailBackend',  # Authenticates using email
+]
+AUTH_USER_MODEL = 'accounts.Member'
+
+
 TWILIO_ACCOUNT_SID = env("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = env("TWILIO_AUTH_TOKEN")
+
+

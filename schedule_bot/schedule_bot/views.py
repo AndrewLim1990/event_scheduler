@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from accounts.models import Member
 from django.shortcuts import render
 from django.shortcuts import redirect
 from django.contrib.auth import logout
@@ -9,7 +9,7 @@ def home(request):
     user_id = request.user.id
     context = {}
     if user_id:
-        user = User.objects.get(id=user_id)
+        user = Member.objects.get(id=user_id)
         user_events = UserEvent.objects.filter(user=user)
         context["user_events"] = user_events
     return render(request, 'home/homepage.html', context)

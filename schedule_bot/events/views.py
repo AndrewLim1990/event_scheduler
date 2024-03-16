@@ -1,5 +1,5 @@
 from collections import defaultdict
-from django.contrib.auth.models import User
+from accounts.models import Member
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render, redirect
 from events.forms import RegistrationForm
@@ -39,7 +39,7 @@ def event_initialization(request):
             ))
 
         # Creates Event and UserEvent associations for all participants
-        host = User.objects.get(id=user_id)
+        host = Member.objects.get(id=user_id)
 
         event = create_event(
             host_user=host,

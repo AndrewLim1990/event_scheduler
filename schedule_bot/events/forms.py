@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.models import User
+from accounts.models import Member
 from django.core.validators import RegexValidator
 from communications.models import UserContactInfo
 from events.models import UserEvent
@@ -24,18 +24,18 @@ class RegistrationForm(forms.ModelForm):
     )
 
     class Meta:
-        model = User
+        model = Member
         fields = ('first_name', 'last_name')
 
     def save(self, commit=True):
         user = super(RegistrationForm, self).save(commit=False)
         user.username = self.cleaned_data['phone_number']
         if commit:
-            user_exists = User.objects.filter(username=user.username).exists()
+            user_exists = Member.objects.filter(username=user.username).exists()
             if not user_exists:
                 user.save()
             else:
-                user = User.objects.get(username=self.cleaned_data['phone_number'])
+                user = Member.objects.get(username=self.cleaned_data['phone_number'])
                 user.save()
 
             # Create or update the UserContactInfo instance
