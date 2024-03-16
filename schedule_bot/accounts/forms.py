@@ -4,6 +4,16 @@ from accounts.models import Member
 from django.core.validators import RegexValidator
 from communications.models import UserContactInfo
 from django.contrib.auth.forms import AuthenticationForm
+from django.core.exceptions import ValidationError
+
+
+def validate_account_exists(phone_number):
+    phone_number_exists = UserContactInfo.objects.filter(phone_number=phone_number).exists()
+    # Check if account exists with phone number and password
+    if phone_number_exists:
+        has_password = UserContactInfo.objects.get(phone_number=phone_number).user.password != ""
+        if has_password:
+            raise ValidationError('An account with that phone number already has an account. Please log in.')
 
 
 class EmailAuthenticationForm(AuthenticationForm):
@@ -19,9 +29,9 @@ class SignUpForm(UserCreationForm):
         message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed."
     )
     phone_number = forms.CharField(
-        validators=[phone_regex],
+        validators=[phone_regex, validate_account_exists],
         max_length=20,
-        required=False,
+        required=True,
         label="Phone Number"
     )
 
