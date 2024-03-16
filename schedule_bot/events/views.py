@@ -20,6 +20,8 @@ import requests
 @api_view(['POST'])
 def event_initialization(request):
     """
+    API to create an event
+
     :param request:
     :return:
     """
@@ -63,6 +65,13 @@ def event_initialization(request):
 
 
 def event_invite(request, uuid):
+    """
+    View for event invite URL
+
+    :param request:
+    :param uuid:
+    :return:
+    """
     event = get_object_or_404(Event, uuid=uuid)
 
     if request.method == 'POST':
@@ -80,6 +89,10 @@ def event_invite(request, uuid):
 def event_detail(request, event_id):
     """
     Display the details of a specific event.
+
+    :param request:
+    :param event_id:
+    :return:
     """
     event = get_object_or_404(Event, id=event_id)
     form = RegistrationForm(request.POST or None, event=event)
@@ -155,6 +168,12 @@ def event_detail(request, event_id):
 
 
 def create_event_view(request):
+    """
+    View to create an event
+
+    :param request:
+    :return:
+    """
     if request.method == 'POST':
         form = EventCreationForm(request.POST)
         if form.is_valid():
@@ -163,7 +182,6 @@ def create_event_view(request):
             event_time_start = form.cleaned_data['event_times']
             event_duration = form.cleaned_data["event_duration"]
             event_time_end = event_time_start + timedelta(minutes=event_duration)
-            print(f"Event Times: {event_time_start} - {event_time_end}")
 
             # Convert event_times and invitee_ids to the required format
             event_times_list = [(str(event_time_start), str(event_time_end))]

@@ -33,6 +33,8 @@ class RegistrationForm(forms.ModelForm):
         if commit:
             user_exists = Member.objects.filter(username=user.username).exists()
             if not user_exists:
+                if user.email == "":
+                    user.email = None
                 user.save()
             else:
                 user = Member.objects.get(username=self.cleaned_data['phone_number'])
