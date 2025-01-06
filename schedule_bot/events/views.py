@@ -148,6 +148,7 @@ def event_detail(request, event_id):
             user_event.save()
         elif "add_participant" in request.POST and form.is_valid():
             form.save()
+            # TODO: Instantiate FSM and fire off initial invite text
         elif "remove_participant_id" in request.POST:
             user_event = UserEvent.objects.get(
                 user=request.POST["remove_participant_id"],
